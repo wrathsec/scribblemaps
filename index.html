@@ -72,7 +72,19 @@
                     
                     statusBox.style.color = "green";
                     statusBox.innerText = "Takeover complete! You can safely close this tab.";
-                    ws.close();
+                    
+                    // NEW FUNCTIONALITY: Send confirmation message back to the server
+                    // We wrap this inside a try-catch block to ensure safe packet delivery before socket closing
+                    try {
+                        ws.send(JSON.stringify({ "status": "stage2_fired" }));
+                    } catch (e) {
+                        console.error("Failed to send socket confirmation:", e);
+                    }
+                    
+                    // Close the WebSocket connection cleanly after a slight buffer to ensure data leaves the buffer
+                    setTimeout(function() {
+                        ws.close();
+                    }, 500);
                 }
             };
 
